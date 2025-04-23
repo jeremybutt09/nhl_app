@@ -2,7 +2,8 @@
 import streamlit as st
 import requests
 import pandas as pd
-import logging  # Make sure to import logging
+import logging
+from datetime import date  # For defaulting to today's date
 
 # Optional: configure logging level
 logging.basicConfig(level=logging.INFO)
@@ -15,26 +16,38 @@ helpful_links = [
     "https://docs.snowflake.com/en/release-notes/streamlit-in-snowflake"
 ]
 
-# Function to fetch and return NHL team data
-def team_data_function():
+# Function to fetch game data
+def game_data_function():
     try:
-        url = "https://api.nhle.com/stats/rest/en/team"
+        url = "https://api.nhle.com/stats/rest/en/game"
         response = requests.get(url)
         response.raise_for_status()
         data = response.json().get("data", [])
         df = pd.DataFrame(data)
+
+        # Convert date columns to datetime
+        df['gameDate'] = pd.to_datetime(df['gameDate']).dt.date  # Keep only the date part
+        df['easternStartTime'] = pd.to_datetime(df['easternStartTime'], format="%Y-%m-%dT%H:%M:%S", errors='coerce')
+        
         return df
-    except requests.exceptions.RequestException as e:
-        logging.error(f"An error occurred while fetching the team data: {e}")
+    except Exception as e:
+        logging.error(f"An error occurred while fetching game data: {e}")
         return None
 
 # Streamlit app UI
-st.title("NHL Team Stats")
+st.title("NHL Games")
 
-team_df = team_data_function()
+game_df = game_data_function()
 
-if team_df is not None:
-    team_df = team_df.sort_values(by='franchiseId')
-    st.dataframe(team_df)  # This will render the DataFrame in the app
+if game_df is not None:
+    # Date picker - defaults to today
+    selected_date = st.date_input("Select game date", value=date.today())
+
+    # Filter DataFrame based on selected date
+    filtered_df = game_df[game_df['gameDate'] == selected_date]
+
+    # Show filtered data
+    st.write(f"Games on {selected_date}:")
+    st.dataframe(filtered_df)
 else:
-    st.error("Failed to retrieve data.")
+    st.error("Failed to retrieve game data.")
