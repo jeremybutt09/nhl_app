@@ -1,35 +1,25 @@
-# Import python packages
 import streamlit as st
 import requests
 import pandas as pd
 import logging
-from datetime import date  # For defaulting to today's date
+from datetime import date
 
-# Optional: configure logging level
+# Configure logging
 logging.basicConfig(level=logging.INFO)
 
-# Helpful links (not displayed but useful during development)
-helpful_links = [
-    "https://docs.streamlit.io",
-    "https://docs.snowflake.com/en/developer-guide/streamlit/about-streamlit",
-    "https://github.com/Snowflake-Labs/snowflake-demo-streamlit",
-    "https://docs.snowflake.com/en/release-notes/streamlit-in-snowflake"
-]
-
-# Function to fetch and return NHL team data
+# Function to fetch NHL team data
 def team_data_function():
     try:
         url = "https://api.nhle.com/stats/rest/en/team"
         response = requests.get(url)
         response.raise_for_status()
         data = response.json().get("data", [])
-        df = pd.DataFrame(data)
-        return df
+        return pd.DataFrame(data)
     except requests.exceptions.RequestException as e:
         logging.error(f"An error occurred while fetching the team data: {e}")
         return None
 
-# Function to fetch game data
+# Function to fetch NHL game data
 def game_data_function():
     try:
         url = "https://api.nhle.com/stats/rest/en/game"
@@ -38,41 +28,54 @@ def game_data_function():
         data = response.json().get("data", [])
         df = pd.DataFrame(data)
 
-        # Convert date columns to datetime
-        df['gameDate'] = pd.to_datetime(df['gameDate']).dt.date  # Keep only the date part
-        df['easternStartTime'] = pd.to_datetime(df['easternStartTime'], format="%Y-%m-%dT%H:%M:%S", errors='coerce')
-        
+        df['gameDate'] = pd.to_datetime(df['gameDate']).dt.date
+        df['easternStartTime'] = pd.to_datetime(df['easternStartTime'], errors='coerce')
         return df
     except Exception as e:
         logging.error(f"An error occurred while fetching game data: {e}")
         return None
 
-# Streamlit app UI
-st.title("NHL Teams")
+# Helper to enrich team names
+def enrich_with_team_names(df, team_df):
+    # Merge home team
+    df = df.merge(team_df[['id', 'fullName', 'rawTricode']], how='left', left_on='homeTeamId', right_on='id')
+    df.rename(columns={'fullName': 'homeTeamFullName', 'rawTricode': 'homeTeamAbrv'}, inplace=True)
+    df.drop(columns=['id'], inplace=True)
 
-# calling team_data_function and assigning to df
-team_df = team_data_function()
+    # Merge visiting team
+    df = df.merge(team_df[['id', 'fullName', 'rawTricode']], how='left', left_on='visitingTeamId', right_on='id')
+    df.rename(columns={'fullName': 'visitingTeamFullName', 'rawTricode': 'visitingTeamAbrv'}, inplace=True)
+    df.drop(columns=['id'], inplace=True)
 
-if team_df is not None:
-    team_df = team_df.sort_values(by='franchiseId')
-    st.dataframe(team_df)  # This will render the DataFrame in the app
-else:
-    st.error("Failed to retrieve data.")
+    return df
 
-# Streamlit app UI
+# Streamlit UI
 st.title("NHL Games")
 
+# Load data
+team_df = team_data_function()
 game_df = game_data_function()
 
-if game_df is not None:
-    # Date picker - defaults to today
-    selected_date = st.date_input("Select game date", value=date.today())
-
-    # Filter DataFrame based on selected date
-    filtered_df = game_df[game_df['gameDate'] == selected_date]
-
-    # Show filtered data
-    st.write(f"Games on {selected_date}:")
-    st.dataframe(filtered_df)
-else:
+if team_df is None:
+    st.error("Failed to retrieve team data.")
+elif game_df is None:
     st.error("Failed to retrieve game data.")
+else:
+    selected_date = st.date_input("Select game date", value=date.today())
+    filtered_df = game_df[game_df['gameDate'] == selected_date].copy()
+
+    if not filtered_df.empty:
+        filtered_df = enrich_with_team_names(filtered_df, team_df)
+
+        # Optional: Select and reorder columns to display
+        display_cols = [
+            'gameId', 'gameDate', 'easternStartTime',
+            'homeTeamFullName', 'homeTeamAbrv',
+            'visitingTeamFullName', 'visitingTeamAbrv',
+            'homeTeamScore', 'visitingTeamScore'
+        ]
+        display_df = filtered_df[display_cols] if all(col in filtered_df.columns for col in display_cols) else filtered_df
+
+        st.dataframe(display_df)
+    else:
+        st.warning(f"No games scheduled for {selected_date}.")
