@@ -69,8 +69,8 @@ else:
         # Optional: Select and reorder columns to display
         display_cols = [
             'gameDate', 'easternStartTime',
-            'homeTeamScore', 'homeTeamFullName', 'homeTeamAbrv',
-            'visitingTeamFullName', 'visitingTeamAbrv', 'visitingTeamScore'
+            'homeScore', 'homeTeamFullName', 'homeTeamAbrv',
+            'visitingTeamFullName', 'visitingTeamAbrv', 'visitingScore'
         ]
         display_df = filtered_df[display_cols] if all(col in filtered_df.columns for col in display_cols) else filtered_df
 
