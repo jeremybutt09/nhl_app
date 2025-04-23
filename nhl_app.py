@@ -16,6 +16,19 @@ helpful_links = [
     "https://docs.snowflake.com/en/release-notes/streamlit-in-snowflake"
 ]
 
+# Function to fetch and return NHL team data
+def team_data_function():
+    try:
+        url = "https://api.nhle.com/stats/rest/en/team"
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json().get("data", [])
+        df = pd.DataFrame(data)
+        return df
+    except requests.exceptions.RequestException as e:
+        logging.error(f"An error occurred while fetching the team data: {e}")
+        return None
+
 # Function to fetch game data
 def game_data_function():
     try:
@@ -33,6 +46,18 @@ def game_data_function():
     except Exception as e:
         logging.error(f"An error occurred while fetching game data: {e}")
         return None
+
+# Streamlit app UI
+st.title("NHL Teams")
+
+# calling team_data_function and assigning to df
+team_df = team_data_function()
+
+if team_df is not None:
+    team_df = team_df.sort_values(by='franchiseId')
+    st.dataframe(team_df)  # This will render the DataFrame in the app
+else:
+    st.error("Failed to retrieve data.")
 
 # Streamlit app UI
 st.title("NHL Games")
