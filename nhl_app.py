@@ -78,7 +78,7 @@ else:
                            'visitingTeamFullName': 'Visiting Team', 
                            'visitingScore': 'Visiting Score', 
                            'homeTeamFullName': 'Home Team',
-                           'homeScore': 'Home Score', }, inplace=True)
+                           'homeScore': 'Home Score'}, inplace=True)
 
         st.dataframe(display_df)
     else:
