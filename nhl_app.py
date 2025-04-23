@@ -74,11 +74,11 @@ else:
         ]
         display_df = filtered_df[display_cols] if all(col in filtered_df.columns for col in display_cols) else filtered_df
 
-        df.rename(columns={'easternStartTime': 'Game Date', 
-                           'visitingTeamFullName': 'Visiting Team', 
-                           'visitingScore': 'Visiting Score', 
-                           'homeTeamFullName': 'Home Team',
-                           'homeScore': 'Home Score'}, inplace=True)
+        display_df.rename(columns={'easternStartTime': 'Game Date', 
+                                   'visitingTeamFullName': 'Visiting Team', 
+                                   'visitingScore': 'Visiting Score', 
+                                   'homeTeamFullName': 'Home Team',
+                                   'homeScore': 'Home Score'}, inplace=True)
 
         st.dataframe(display_df)
     else:
