@@ -39,12 +39,12 @@ def enrich_with_team_names(df, team_df):
     # Merge home team
     df = df.merge(team_df[['id', 'fullName', 'rawTricode']], how='left', left_on='homeTeamId', right_on='id')
     df.rename(columns={'fullName': 'homeTeamFullName', 'rawTricode': 'homeTeamAbrv'}, inplace=True)
-    df.drop(columns=['id'], inplace=True, errors='ignore')  # Safe drop
+    #df.drop(columns=['id'], inplace=True, errors='ignore')  # Safe drop
 
     # Merge visiting team
     df = df.merge(team_df[['id', 'fullName', 'rawTricode']], how='left', left_on='visitingTeamId', right_on='id')
     df.rename(columns={'fullName': 'visitingTeamFullName', 'rawTricode': 'visitingTeamAbrv'}, inplace=True)
-    df.drop(columns=['id'], inplace=True, errors='ignore')  # Safe drop
+    #df.drop(columns=['id'], inplace=True, errors='ignore')  # Safe drop
 
     return df
 
