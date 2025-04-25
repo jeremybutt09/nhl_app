@@ -79,13 +79,13 @@ else:
         filtered_df = enrich_with_team_names(filtered_df, team_df)
 
         # Get list of gameIds from filtered dataframe
-        game_id_ls = list(filtered_df['gameId'])
+        game_ids = list(filtered_df['gameId'])
         
         # Initialize rows for clock/period data
         rows = []
         
         # Fetch data for each gameId
-        for game_id in game_id_ls:
+        for game_id in game_ids:
             try:
                 url = f"https://api-web.nhle.com/v1/gamecenter/{game_id}/boxscore"
                 response = requests.get(url)
