@@ -15,7 +15,9 @@ def team_data_function():
         response = requests.get(url)
         response.raise_for_status()
         data = response.json().get("data", [])
-        return pd.DataFrame(data)
+        df = pd.DataFrame(data)
+        df.rename(columns={'id': 'teamId'}, inplace=True)
+        return df
     except requests.exceptions.RequestException as e:
         logging.error(f"An error occurred while fetching the team data: {e}")
         return None
@@ -31,6 +33,7 @@ def game_data_function():
 
         df['gameDate'] = pd.to_datetime(df['gameDate']).dt.date
         df['easternStartTime'] = pd.to_datetime(df['easternStartTime'], errors='coerce')
+        df.rename(columns={'id': 'gameId'}, inplace=True)
         return df
     except Exception as e:
         logging.error(f"An error occurred while fetching game data: {e}")
@@ -38,14 +41,14 @@ def game_data_function():
 
 def enrich_with_team_names(df, team_df):
     # Merge home team
-    df = df.merge(team_df[['id', 'fullName', 'rawTricode']], how='left', left_on='homeTeamId', right_on='id')
+    df = df.merge(team_df[['teamId', 'fullName', 'rawTricode']], how='left', left_on='homeTeamId', right_on='teamId')
     df.rename(columns={'fullName': 'homeTeamFullName', 'rawTricode': 'homeTeamAbrv'}, inplace=True)
-    #df.drop(columns=['id'], inplace=True, errors='ignore')  # Safe drop
+    df.drop(columns=['teamId'], inplace=True, errors='ignore')  # Safe drop
 
     # Merge visiting team
-    df = df.merge(team_df[['id', 'fullName', 'rawTricode']], how='left', left_on='visitingTeamId', right_on='id')
+    df = df.merge(team_df[['teamId', 'fullName', 'rawTricode']], how='left', left_on='visitingTeamId', right_on='teamId')
     df.rename(columns={'fullName': 'visitingTeamFullName', 'rawTricode': 'visitingTeamAbrv'}, inplace=True)
-    #df.drop(columns=['id'], inplace=True, errors='ignore')  # Safe drop
+    df.drop(columns=['teamId'], inplace=True, errors='ignore')  # Safe drop
 
     return df
 
