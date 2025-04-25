@@ -52,6 +52,14 @@ def enrich_with_team_names(df, team_df):
 
     return df
 
+def ordinal(n):
+    if 10 <= n % 100 <= 20:
+        suffix = 'th'
+    else:
+        suffix = {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, 'th')
+    return f"{n}{suffix}"
+
+
 # Streamlit UI
 st.title("NHL Games")
 
@@ -102,7 +110,7 @@ else:
             if row["timeRemaining"] is None or row["periodNumber"] is None:
                 return None
             if 1 <= row['periodNumber'] <= 3:
-                return f"{row['timeRemaining']} {row['periodNumber']}"
+                return f"{row['timeRemaining']} {ordinal(row['periodNumber'])}"
             elif row['periodNumber'] > 3:
                 overtime_number = row['periodNumber'] - 3
                 return f"{row['timeRemaining']} {overtime_number}{row['periodType']}"
@@ -113,10 +121,6 @@ else:
         
         # Merge Period Output into filtered_df
         filtered_df = filtered_df.merge(period_df[['gameId', 'periodOutput']], on='gameId', how='left')
-        
-        # Add 'Period Output' to displayed columns if desired
-        # if 'periodOutput' in filtered_df.columns:
-        #     display_cols.insert(0, 'periodOutput')  # or append instead if you want it at the end
 
         # Optional: Select and reorder columns to display
         display_cols = [
@@ -133,8 +137,8 @@ else:
                                    'homeTeamFullName': 'Home Team',
                                    'homeScore': 'Home Score'}, inplace=True)
 
-        st.dataframe(period_df)
-        st.dataframe(filtered_df)
+        # st.dataframe(period_df)
+        # st.dataframe(filtered_df)
         st.dataframe(display_df)
     else:
         st.warning(f"No games scheduled for {selected_date}.")
