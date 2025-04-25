@@ -86,9 +86,9 @@ else:
         
                 row = {
                     "gameId": game_id,
-                    "Time Remaining": data.get("clock", {}).get("timeRemaining"),
-                    "Period Number": data.get("periodDescriptor", {}).get("number"),
-                    "Period Type": data.get("periodDescriptor", {}).get("periodType")
+                    "timeRemaining": data.get("clock", {}).get("timeRemaining"),
+                    "periodNumber": data.get("periodDescriptor", {}).get("number"),
+                    "periodType": data.get("periodDescriptor", {}).get("periodType")
                 }
                 rows.append(row)
             except Exception as e:
@@ -99,34 +99,35 @@ else:
         
         # Format period output
         def format_period_output(row):
-            if row["Time Remaining"] is None or row["Period Number"] is None:
+            if row["Time Remaining"] is None or row["periodNumber"] is None:
                 return None
-            if 1 <= row['Period Number'] <= 3:
-                return f"{row['Time Remaining']} {row['Period Number']}"
-            elif row['Period Number'] > 3:
-                overtime_number = row['Period Number'] - 3
-                return f"{row['Time Remaining']} {overtime_number}{row['Period Type']}"
+            if 1 <= row['periodNumber'] <= 3:
+                return f"{row['timeRemaining']} {row['periodNumber']}"
+            elif row['periodNumber'] > 3:
+                overtime_number = row['periodNumber'] - 3
+                return f"{row['timeRemaining']} {overtime_number}{row['periodType']}"
             else:
                 return None
         
-        period_df['Period Output'] = period_df.apply(format_period_output, axis=1)
+        period_df['periodOutput'] = period_df.apply(format_period_output, axis=1)
         
-        # # Merge Period Output into filtered_df
-        filtered_df = filtered_df.merge(period_df[['gameId', 'Period Output']], on='gameId', how='left')
+        # Merge Period Output into filtered_df
+        filtered_df = filtered_df.merge(period_df[['gameId', 'periodOutput']], on='gameId', how='left')
         
-        # # Add 'Period Output' to displayed columns if desired
-        # if 'Period Output' in filtered_df.columns:
-        #     display_cols.insert(0, 'Period Output')  # or append instead if you want it at the end
+        # Add 'Period Output' to displayed columns if desired
+        if 'periodOutput' in filtered_df.columns:
+            display_cols.insert(0, 'periodOutput')  # or append instead if you want it at the end
 
         # Optional: Select and reorder columns to display
         display_cols = [
-            'easternStartTime',
+            'easternStartTime', periodOutput,
             'visitingTeamFullName', 'visitingScore',
             'homeTeamFullName', 'homeScore'
         ]
         display_df = filtered_df[display_cols] if all(col in filtered_df.columns for col in display_cols) else filtered_df
 
         display_df.rename(columns={'easternStartTime': 'Game Date', 
+                                   'periodOutput': 'Period',
                                    'visitingTeamFullName': 'Visiting Team', 
                                    'visitingScore': 'Visiting Score', 
                                    'homeTeamFullName': 'Home Team',
