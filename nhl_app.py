@@ -70,11 +70,11 @@ else:
     if not filtered_df.empty:
         filtered_df = enrich_with_team_names(filtered_df, team_df)
 
-        # # Get list of gameIds from filtered dataframe
-        # game_id_ls = list(filtered_df['gameId'])
+        # Get list of gameIds from filtered dataframe
+        game_id_ls = list(filtered_df['gameId'])
         
-        # # Initialize rows for clock/period data
-        # rows = []
+        # Initialize rows for clock/period data
+        rows = []
         
         # # Fetch data for each gameId
         # for game_id in game_id_ls:
