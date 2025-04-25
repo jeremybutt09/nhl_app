@@ -96,7 +96,8 @@ else:
                     "gameId": game_id,
                     "timeRemaining": data.get("clock", {}).get("timeRemaining"),
                     "periodNumber": data.get("periodDescriptor", {}).get("number"),
-                    "periodType": data.get("periodDescriptor", {}).get("periodType")
+                    "periodType": data.get("periodDescriptor", {}).get("periodType"),
+                    "gameOutcome": data.get("gameOutcome", {})
                 }
                 rows.append(row)
             except Exception as e:
@@ -109,7 +110,9 @@ else:
         def format_period_output(row):
             if row["timeRemaining"] is None or row["periodNumber"] is None:
                 return None
-            if 1 <= row['periodNumber'] <= 3:
+            if row['gameOutcome':
+                return 'Final'
+            elif 1 <= row['periodNumber'] <= 3:
                 return f"{row['timeRemaining']} {ordinal(row['periodNumber'])}"
             elif row['periodNumber'] > 3:
                 overtime_number = row['periodNumber'] - 3
