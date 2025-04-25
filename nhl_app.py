@@ -115,8 +115,8 @@ else:
         filtered_df = filtered_df.merge(period_df[['gameId', 'periodOutput']], on='gameId', how='left')
         
         # Add 'Period Output' to displayed columns if desired
-        if 'periodOutput' in filtered_df.columns:
-            display_cols.insert(0, 'periodOutput')  # or append instead if you want it at the end
+        # if 'periodOutput' in filtered_df.columns:
+        #     display_cols.insert(0, 'periodOutput')  # or append instead if you want it at the end
 
         # Optional: Select and reorder columns to display
         display_cols = [
