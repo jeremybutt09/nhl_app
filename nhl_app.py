@@ -110,7 +110,7 @@ else:
         def format_period_output(row):
             if row["timeRemaining"] is None or row["periodNumber"] is None:
                 return None
-            if row['gameOutcome':
+            if row['gameOutcome']:
                 return 'Final'
             elif 1 <= row['periodNumber'] <= 3:
                 return f"{row['timeRemaining']} {ordinal(row['periodNumber'])}"
