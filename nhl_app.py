@@ -99,7 +99,7 @@ else:
         
         # Format period output
         def format_period_output(row):
-            if row["Time Remaining"] is None or row["periodNumber"] is None:
+            if row["timeRemaining"] is None or row["periodNumber"] is None:
                 return None
             if 1 <= row['periodNumber'] <= 3:
                 return f"{row['timeRemaining']} {row['periodNumber']}"
