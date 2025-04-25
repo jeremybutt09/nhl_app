@@ -76,43 +76,43 @@ else:
         # Initialize rows for clock/period data
         rows = []
         
-        # # Fetch data for each gameId
-        # for game_id in game_id_ls:
-        #     try:
-        #         url = f"https://api-web.nhle.com/v1/gamecenter/{game_id}/boxscore"
-        #         response = requests.get(url)
-        #         response.raise_for_status()
-        #         data = response.json()
+        # Fetch data for each gameId
+        for game_id in game_id_ls:
+            try:
+                url = f"https://api-web.nhle.com/v1/gamecenter/{game_id}/boxscore"
+                response = requests.get(url)
+                response.raise_for_status()
+                data = response.json()
         
-        #         row = {
-        #             "gameId": game_id,
-        #             "Time Remaining": data.get("clock", {}).get("timeRemaining"),
-        #             "Period Number": data.get("periodDescriptor", {}).get("number"),
-        #             "Period Type": data.get("periodDescriptor", {}).get("periodType")
-        #         }
-        #         rows.append(row)
-        #     except Exception as e:
-        #         logging.warning(f"Failed to fetch data for gameId {game_id}: {e}")
+                row = {
+                    "gameId": game_id,
+                    "Time Remaining": data.get("clock", {}).get("timeRemaining"),
+                    "Period Number": data.get("periodDescriptor", {}).get("number"),
+                    "Period Type": data.get("periodDescriptor", {}).get("periodType")
+                }
+                rows.append(row)
+            except Exception as e:
+                logging.warning(f"Failed to fetch data for gameId {game_id}: {e}")
         
-        # # Create DataFrame from clock/period data
-        # period_df = pd.DataFrame(rows)
+        # Create DataFrame from clock/period data
+        period_df = pd.DataFrame(rows)
         
-        # # Format period output
-        # def format_period_output(row):
-        #     if row["Time Remaining"] is None or row["Period Number"] is None:
-        #         return None
-        #     if 1 <= row['Period Number'] <= 3:
-        #         return f"{row['Time Remaining']} {row['Period Number']}"
-        #     elif row['Period Number'] > 3:
-        #         overtime_number = row['Period Number'] - 3
-        #         return f"{row['Time Remaining']} {overtime_number}{row['Period Type']}"
-        #     else:
-        #         return None
+        # Format period output
+        def format_period_output(row):
+            if row["Time Remaining"] is None or row["Period Number"] is None:
+                return None
+            if 1 <= row['Period Number'] <= 3:
+                return f"{row['Time Remaining']} {row['Period Number']}"
+            elif row['Period Number'] > 3:
+                overtime_number = row['Period Number'] - 3
+                return f"{row['Time Remaining']} {overtime_number}{row['Period Type']}"
+            else:
+                return None
         
-        # period_df['Period Output'] = period_df.apply(format_period_output, axis=1)
+        period_df['Period Output'] = period_df.apply(format_period_output, axis=1)
         
         # # Merge Period Output into filtered_df
-        # filtered_df = filtered_df.merge(period_df[['gameId', 'Period Output']], on='gameId', how='left')
+        filtered_df = filtered_df.merge(period_df[['gameId', 'Period Output']], on='gameId', how='left')
         
         # # Add 'Period Output' to displayed columns if desired
         # if 'Period Output' in filtered_df.columns:
