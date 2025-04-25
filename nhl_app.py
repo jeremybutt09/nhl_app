@@ -132,8 +132,9 @@ else:
                                    'visitingScore': 'Visiting Score', 
                                    'homeTeamFullName': 'Home Team',
                                    'homeScore': 'Home Score'}, inplace=True)
-        
-        # st.dataframe(filtered_df)
+
+        st.dataframe(period_df)
+        st.dataframe(filtered_df)
         st.dataframe(display_df)
     else:
         st.warning(f"No games scheduled for {selected_date}.")
