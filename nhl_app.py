@@ -131,7 +131,10 @@ else:
             'visitingTeamFullName', 'visitingScore',
             'homeTeamFullName', 'homeScore'
         ]
+        
         display_df = filtered_df[display_cols] if all(col in filtered_df.columns for col in display_cols) else filtered_df
+
+        df.sort_values('easternStartTime', inplace = True)
 
         display_df.rename(columns={'easternStartTime': 'Game Date', 
                                    'periodOutput': 'Period',
