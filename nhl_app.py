@@ -140,6 +140,9 @@ else:
                                    'homeTeamFullName': 'Home Team',
                                    'homeScore': 'Home Score'}, inplace=True)
 
+        # Format the datetime column
+        display_df['Game Date'] = display_df['Game Date'].dt.strftime("%B %d, %Y %I:%M%p")
+
         # st.dataframe(filtered_df)
         st.dataframe(display_df, use_container_width = True, hide_index = True)
     else:
