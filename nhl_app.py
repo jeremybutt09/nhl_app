@@ -140,7 +140,6 @@ else:
                                    'homeTeamFullName': 'Home Team',
                                    'homeScore': 'Home Score'}, inplace=True)
 
-        # st.dataframe(period_df)
         # st.dataframe(filtered_df)
         st.dataframe(display_df, use_container_width = True, hide_index = True)
     else:
