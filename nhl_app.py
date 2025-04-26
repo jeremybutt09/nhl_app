@@ -72,7 +72,7 @@ if team_df is None:
 elif game_df is None:
     st.error("Failed to retrieve game data.")
 else:
-    selected_date = st.date_input("Select game date", value="today", format = "%B %d, %Y")
+    selected_date = st.date_input("Select game date")
     filtered_df = game_df[game_df['gameDate'] == selected_date].copy()
 
     if not filtered_df.empty:
