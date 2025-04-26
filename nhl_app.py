@@ -142,6 +142,7 @@ else:
 
         # st.dataframe(period_df)
         # st.dataframe(filtered_df)
-        st.dataframe(display_df, use_container_width = True)
+        # st.dataframe(display_df, use_container_width = True)
+        st.table(display_df)
     else:
         st.warning(f"No games scheduled for {selected_date}.")
